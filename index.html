@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrbitPanel — Social Growth Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">O</div>
+          <div><strong>orbit<span>panel</span></strong><small>Social growth, simplified.</small></div>
+        </div>
+        <nav class="nav">
+          <p class="nav-label">Workspace</p>
+          <button class="nav-item active" data-view="overview"><span>⌂</span> Overview</button>
+          <button class="nav-item" data-view="new-order"><span>＋</span> New order</button>
+          <button class="nav-item" data-view="orders"><span>▤</span> My orders</button>
+          <button class="nav-item" data-view="services"><span>◈</span> Services</button>
+          <p class="nav-label">Finance</p>
+          <button class="nav-item" data-view="wallet"><span>◒</span> Add funds</button>
+          <button class="nav-item" data-view="transactions"><span>↕</span> Transactions</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="help-card"><div class="help-icon">?</div><strong>Need a hand?</strong><p>Our team usually replies in under 10 minutes.</p><button>Open support chat →</button></div>
+          <div class="user-chip"><div class="avatar">AK</div><div><strong>Alex Kumar</strong><small>Pro account</small></div><span>•••</span></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="mobile-brand"><div class="brand-mark">O</div><strong>orbit<span>panel</span></strong></div>
+          <div class="topbar-actions"><button class="icon-btn" aria-label="Notifications">♢<i></i></button><button class="icon-btn" aria-label="Settings">⚙</button><button class="menu-btn" aria-label="Open menu">☰</button></div>
+        </header>
+
+        <div id="view-container">
+          <section class="view active" id="overview">
+            <div class="page-heading"><div><p class="eyebrow">SATURDAY, NOVEMBER 01, 2026</p><h1>Good morning, Alex <span>✦</span></h1><p class="muted">Here’s what’s happening with your social growth today.</p></div><button class="primary-btn" data-go="new-order">＋ Create new order</button></div>
+            <div class="stat-grid">
+              <article class="stat-card balance"><div class="stat-top"><span>Available balance</span><span class="trend neutral">USD</span></div><strong>$248.90</strong><div class="stat-foot"><span class="positive">↗ $84.20 this month</span><button data-go="wallet">Add funds →</button></div></article>
+              <article class="stat-card"><div class="stat-top"><span>Active orders</span><span class="stat-icon purple">◈</span></div><strong>12</strong><div class="stat-foot"><span class="muted">4 processing right now</span><span class="trend">+18.4%</span></div></article>
+              <article class="stat-card"><div class="stat-top"><span>Completed orders</span><span class="stat-icon green">✓</span></div><strong>184</strong><div class="stat-foot"><span class="muted">Since your first order</span><span class="trend">+12.8%</span></div></article>
+              <article class="stat-card"><div class="stat-top"><span>Avg. completion</span><span class="stat-icon orange">◷</span></div><strong>2h 14m</strong><div class="stat-foot"><span class="muted">Across all services</span><span class="positive">Faster than 92%</span></div></article>
+            </div>
+            <div class="content-grid">
+              <article class="panel chart-panel"><div class="panel-head"><div><h2>Growth overview</h2><p class="muted">Your order activity over the last 30 days</p></div><select><option>Last 30 days</option><option>Last 7 days</option></select></div><div class="legend"><span><i class="dot purple-dot"></i> Orders</span><span><i class="dot orange-dot"></i> Spend</span></div><div class="chart"><div class="y-axis"><span>120</span><span>90</span><span>60</span><span>30</span><span>0</span></div><div class="chart-area"><div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div><svg viewBox="0 0 620 200" preserveAspectRatio="none"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7657f6" stop-opacity=".24"/><stop offset="1" stop-color="#7657f6" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0,165 C35,152 45,158 70,139 S115,150 138,115 S175,131 205,116 S250,98 278,112 S318,69 350,82 S390,67 420,75 S460,45 490,60 S525,38 550,42 S590,20 620,28 L620,200 L0,200Z"/><path class="line" d="M0,165 C35,152 45,158 70,139 S115,150 138,115 S175,131 205,116 S250,98 278,112 S318,69 350,82 S390,67 420,75 S460,45 490,60 S525,38 550,42 S590,20 620,28"/></svg><div class="x-axis"><span>Oct 03</span><span>Oct 10</span><span>Oct 17</span><span>Oct 24</span><span>Oct 31</span></div></div></div></article>
+              <article class="panel quick-panel"><div class="panel-head"><div><h2>Quick order</h2><p class="muted">Start growing in seconds</p></div><span class="spark">✦</span></div><label>Service<select id="quick-service"><option>Instagram · Followers</option><option>YouTube · Views</option><option>TikTok · Likes</option></select></label><label>Link<input id="quick-link" placeholder="https://instagram.com/yourprofile" /></label><div class="quantity-line"><label>Quantity<input id="quick-quantity" type="number" value="1000" /></label><div class="price-box"><small>Total price</small><strong id="quick-price">$2.40</strong></div></div><button class="primary-btn wide" id="quick-submit">Place order <span>→</span></button><p class="secure-note">⌁ Secure checkout · Instant delivery starts</p></article>
+            </div>
+            <article class="panel orders-panel"><div class="panel-head"><div><h2>Recent orders</h2><p class="muted">Keep an eye on your latest campaigns</p></div><button class="text-btn" data-go="orders">View all orders →</button></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Service</th><th>Link</th><th>Quantity</th><th>Status</th><th>Amount</th></tr></thead><tbody id="recent-orders"></tbody></table></div></article>
+          </section>
+
+          <section class="view" id="new-order"><div class="page-heading"><div><p class="eyebrow">SERVICES</p><h1>Create a new order</h1><p class="muted">Choose a service and let OrbitPanel handle the rest.</p></div></div><div class="new-order-layout"><article class="panel order-form"><div class="form-step"><span>01</span><div><h2>Choose a service</h2><p class="muted">Select from our high-quality growth services.</p></div></div><label>Category<select id="category"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Facebook</option></select></label><label>Service<select id="service"><option value="2.4">Instagram Followers · 30-day refill</option><option value="3.8">Instagram Likes · High retention</option><option value="5.2">Instagram Reel Views · Worldwide</option></select></label><div class="service-info"><span>⚡ Fast delivery</span><span>✓ Refill guarantee</span><span>♢ 24/7 support</span></div><div class="form-step second"><span>02</span><div><h2>Order details</h2><p class="muted">Tell us where to deliver your order.</p></div></div><label>Link<input id="order-link" placeholder="Paste your profile or post link" /></label><label>Quantity<input id="order-quantity" type="number" value="1000" min="100" /></label><div class="order-summary"><span>Total to pay</span><strong id="form-price">$2.40</strong></div><button class="primary-btn wide" id="place-order">Place order <span>→</span></button></article><aside class="panel guarantee"><div class="guarantee-icon">✦</div><h2>Built for real growth</h2><p>Every service is tested, tracked and backed by our refill guarantee.</p><div class="guarantee-item"><b>01</b><span><strong>High quality delivery</strong><small>Real-looking profiles and gradual delivery.</small></span></div><div class="guarantee-item"><b>02</b><span><strong>Live tracking</strong><small>Watch progress from your dashboard.</small></span></div><div class="guarantee-item"><b>03</b><span><strong>Friendly support</strong><small>We’re here whenever you need us.</small></span></div></aside></div></section>
+
+          <section class="view" id="orders"><div class="page-heading"><div><p class="eyebrow">WORKSPACE</p><h1>My orders</h1><p class="muted">Track and manage every campaign in one place.</p></div><button class="primary-btn" data-go="new-order">＋ New order</button></div><article class="panel orders-panel"><div class="filter-row"><div class="tabs"><button class="selected">All orders <b>196</b></button><button>Processing <b>12</b></button><button>Completed <b>184</b></button></div><input class="search" placeholder="⌕  Search orders" /></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Service</th><th>Link</th><th>Quantity</th><th>Progress</th><th>Status</th><th>Amount</th></tr></thead><tbody id="all-orders"></tbody></table></div></article></section>
+
+          <section class="view" id="services"><div class="page-heading"><div><p class="eyebrow">CATALOG</p><h1>Services</h1><p class="muted">Simple, transparent services for every platform.</p></div></div><div class="service-grid"><article class="service-card"><div class="service-logo instagram">◎</div><h2>Instagram</h2><p>Build a stronger presence with followers, likes and reel views.</p><button data-go="new-order">Browse services →</button></article><article class="service-card"><div class="service-logo youtube">▶</div><h2>YouTube</h2><p>Reach more viewers with views, subscribers and engagement.</p><button data-go="new-order">Browse services →</button></article><article class="service-card"><div class="service-logo tiktok">♪</div><h2>TikTok</h2><p>Put your content in front of the right audience, faster.</p><button data-go="new-order">Browse services →</button></article></div></section>
+
+          <section class="view" id="wallet"><div class="page-heading"><div><p class="eyebrow">FINANCE</p><h1>Add funds</h1><p class="muted">Top up your balance and keep your campaigns moving.</p></div></div><div class="wallet-layout"><article class="panel add-funds"><h2>Choose amount</h2><div class="amount-display">$<input value="100" id="fund-amount" type="number" /></div><div class="amounts"><button>$25</button><button class="active">$100</button><button>$250</button><button>$500</button></div><h3>Payment method</h3><div class="payment selected"><span class="card-icon">▰</span><span><strong>Credit or debit card</strong><small>Visa, Mastercard, Amex</small></span><i>✓</i></div><div class="payment"><span class="card-icon">P</span><span><strong>PayPal</strong><small>Fast and secure checkout</small></span></div><button class="primary-btn wide" id="fund-button">Continue to payment <span>→</span></button></article><article class="panel balance-card"><p class="muted">Current balance</p><strong>$248.90</strong><div class="balance-line"><span>Monthly spend</span><b>$186.40</b></div><div class="progress"><i></i></div><p class="muted small">You’ve spent 37% of your monthly budget.</p></article></div></section>
+
+          <section class="view" id="transactions"><div class="page-heading"><div><p class="eyebrow">FINANCE</p><h1>Transactions</h1><p class="muted">A clear history of your account activity.</p></div></div><article class="panel orders-panel"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Status</th><th>Amount</th></tr></thead><tbody><tr><td>Oct 31, 2026</td><td>Instagram Followers order <small>#OR-10482</small></td><td>Debit</td><td><span class="status completed">Completed</span></td><td class="amount debit">−$12.00</td></tr><tr><td>Oct 28, 2026</td><td>Added funds <small>Visa ending 4242</small></td><td>Credit</td><td><span class="status completed">Completed</span></td><td class="amount credit">+$100.00</td></tr><tr><td>Oct 24, 2026</td><td>YouTube Views order <small>#OR-10401</small></td><td>Debit</td><td><span class="status completed">Completed</span></td><td class="amount debit">−$8.40</td></tr></tbody></table></div></article></section>
+        </div>
+        <footer><span>© 2026 OrbitPanel</span><span>Built for creators who think bigger <b>✦</b></span></footer>
+      </main>
+    </div>
+    <div class="auth-screen" id="auth-screen">
+      <div class="auth-card">
+        <div class="brand auth-brand"><div class="brand-mark">O</div><strong>orbit<span>panel</span></strong></div>
+        <p class="eyebrow">WELCOME BACK</p>
+        <h1>Grow your presence.</h1>
+        <p class="muted">Sign in to manage your social growth campaigns.</p>
+        <form id="login-form">
+          <label>Email address<input id="login-email" type="email" value="demo@orbitpanel.com" required /></label>
+          <label>Password<input id="login-password" type="password" value="demo123" required /></label>
+          <button class="primary-btn wide" type="submit">Sign in <span>→</span></button>
+          <p class="demo-hint">Demo account: demo@orbitpanel.com · demo123</p>
+          <p class="auth-error" id="auth-error"></p>
+        </form>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
