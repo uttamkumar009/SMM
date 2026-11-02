@@ -1,10 +1,10 @@
-# SMM frontend
+# BabiesiQ SMM
 
-Static OrbitPanel dashboard for `smm.babiesiq.tech`.
+Static BabiesiQ SMM dashboard for `smm.babiesiq.tech`.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/uttamkumar009/SMM)
 
-The frontend calls `https://api.smm.babiesiq.tech/api` by default. Add a custom `window.ORBIT_API_URL` before `app.js` if your API is deployed at another URL.
+The frontend calls `https://api.smm.babiesiq.tech/api` by default. Services and order IDs are loaded through the backend; the provider API key never reaches the browser.
 
 ## Vercel deployment
 
