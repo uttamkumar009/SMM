@@ -30,10 +30,20 @@ function renderOrders(items) {
 
 function renderServices(items) {
   services = items;
+  const catalog = document.querySelector("#service-catalog");
+  if (catalog) {
+    catalog.innerHTML = items.map(service => `<article class="service-card"><div class="service-logo instagram">✦</div><h2>${escapeHTML(service.name)}</h2><p>${escapeHTML(service.type || "Social growth service")} · ${Number(service.rate || 0).toFixed(2)} per 1k</p><button data-go="new-order" data-service-id="${service.service}">Order this service →</button></article>`).join("") || '<p class="muted">No live services available.</p>';
+  }
   const options = items.map(service => `<option value="${service.rate}" data-service-id="${service.service}" data-service-name="${service.name}" data-min="${service.min}" data-max="${service.max}">${service.name} · ${service.rate}/1k</option>`).join("");
   document.querySelector("#service").innerHTML = options;
   document.querySelector("#quick-service").innerHTML = items.slice(0, 20).map(service => `<option value="${service.service}">${service.name}</option>`).join("");
   updatePrice("#order-quantity", "#form-price", "#service");
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[character]));
 }
 
 async function loadServices() {
