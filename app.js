@@ -1,5 +1,6 @@
 const API = window.ORBIT_API_URL || "https://api.smm.babiesiq.tech/api";
 let token = localStorage.getItem("orbit_token");
+let catalogServices = [];
 const orders = [
   {id:"#OR-10482", service:"Instagram Followers", link:"instagram.com/alexcreates", qty:"5,000", progress:72, status:"processing", amount:"$12.00"},
   {id:"#OR-10476", service:"YouTube Views", link:"youtube.com/watch?v=8k2...", qty:"10,000", progress:100, status:"completed", amount:"$8.40"},
@@ -66,22 +67,52 @@ document.addEventListener("click", (event) => {
 
 const updatePrice = (inputId, priceId, serviceId) => {
   const quantity = Math.max(0, Number(document.querySelector(inputId).value) || 0);
-  const rate = serviceId ? Number(document.querySelector(serviceId).value) : 2.4;
+  const rate = serviceId ? Number(document.querySelector(serviceId).selectedOptions[0]?.dataset.rate || 0) : Number(document.querySelector("#quick-service").selectedOptions[0]?.dataset.rate || 0);
   document.querySelector(priceId).textContent = `$${(quantity / 1000 * rate).toFixed(2)}`;
 };
 
+async function loadCatalog() {
+  const categorySelect = document.querySelector("#category");
+  const serviceSelect = document.querySelector("#service");
+  const quickSelect = document.querySelector("#quick-service");
+  try {
+    const categoryData = await api("/categories");
+    categorySelect.innerHTML = categoryData.categories.map(category => `<option value="${category}">${category}</option>`).join("");
+    const loadServices = async () => {
+      const data = await api("/services?category=" + encodeURIComponent(categorySelect.value));
+      catalogServices = data.services;
+      serviceSelect.innerHTML = data.services.map(service => `<option value="${service.service}" data-rate="${service.rate}" data-min="${service.min}" data-max="${service.max}">${service.name} · ${service.rate}/1K</option>`).join("");
+      serviceSelect.dispatchEvent(new Event("change"));
+    };
+    await loadServices();
+    const all = await api("/services");
+    quickSelect.innerHTML = all.services.map(service => `<option value="${service.service}" data-rate="${service.rate}">${service.category} · ${service.name}</option>`).join("");
+    quickSelect.dispatchEvent(new Event("change"));
+    categorySelect.addEventListener("change", loadServices);
+  } catch (error) {
+    toast("Could not load service catalog: " + error.message);
+  }
+}
+
 document.querySelector("#quick-quantity").addEventListener("input", () => updatePrice("#quick-quantity", "#quick-price"));
+document.querySelector("#quick-service").addEventListener("change", () => updatePrice("#quick-quantity", "#quick-price"));
 document.querySelector("#order-quantity").addEventListener("input", () => updatePrice("#order-quantity", "#form-price", "#service"));
-document.querySelector("#service").addEventListener("change", () => updatePrice("#order-quantity", "#form-price", "#service"));
+document.querySelector("#service").addEventListener("change", () => {
+  const option = document.querySelector("#service").selectedOptions[0];
+  document.querySelector("#order-quantity").min = option?.dataset.min || 1;
+  updatePrice("#order-quantity", "#form-price", "#service");
+});
 document.querySelector("#quick-submit").addEventListener("click", () => {
   if (!document.querySelector("#quick-link").value.trim()) return toast("Please add a profile or post link first.");
-  api("/orders", {method:"POST", body:JSON.stringify({service:document.querySelector("#quick-service").value, link:document.querySelector("#quick-link").value, quantity:Number(document.querySelector("#quick-quantity").value), rate:2.4})})
+  const selected = document.querySelector("#quick-service").selectedOptions[0];
+  api("/orders", {method:"POST", body:JSON.stringify({serviceId:Number(selected.value), service:selected.textContent, link:document.querySelector("#quick-link").value, quantity:Number(document.querySelector("#quick-quantity").value)})})
     .then(result => { toast("Order created successfully — opening order tracker."); renderOrders([result.order, ...orders]); showView("orders"); })
     .catch(error => toast(error.message));
 });
 document.querySelector("#place-order").addEventListener("click", () => {
   if (!document.querySelector("#order-link").value.trim()) return toast("Please add a profile or post link first.");
-  api("/orders", {method:"POST", body:JSON.stringify({service:document.querySelector("#service").selectedOptions[0].textContent, link:document.querySelector("#order-link").value, quantity:Number(document.querySelector("#order-quantity").value), rate:Number(document.querySelector("#service").value)})})
+  const selected = document.querySelector("#service").selectedOptions[0];
+  api("/orders", {method:"POST", body:JSON.stringify({serviceId:Number(selected.value), service:selected.textContent, link:document.querySelector("#order-link").value, quantity:Number(document.querySelector("#order-quantity").value)})})
     .then(result => { toast("Your order has been placed successfully."); renderOrders([result.order, ...orders]); setTimeout(() => showView("orders"), 700); })
     .catch(error => toast(error.message));
 });
@@ -111,3 +142,4 @@ document.querySelector("#login-form").addEventListener("submit", async event => 
 });
 
 loadAccount();
+loadCatalog();
