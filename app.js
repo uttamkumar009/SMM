@@ -1,13 +1,8 @@
 const API = window.ORBIT_API_URL || "https://api.smm.babiesiq.tech/api";
 let token = localStorage.getItem("orbit_token");
+let orders = [];
+let services = [];
 let catalogServices = [];
-const orders = [
-  {id:"#OR-10482", service:"Instagram Followers", link:"instagram.com/alexcreates", qty:"5,000", progress:72, status:"processing", amount:"$12.00"},
-  {id:"#OR-10476", service:"YouTube Views", link:"youtube.com/watch?v=8k2...", qty:"10,000", progress:100, status:"completed", amount:"$8.40"},
-  {id:"#OR-10461", service:"TikTok Likes", link:"tiktok.com/@alex/video/...", qty:"2,500", progress:100, status:"completed", amount:"$4.75"},
-  {id:"#OR-10455", service:"Instagram Reel Views", link:"instagram.com/reel/Cx...", qty:"25,000", progress:36, status:"processing", amount:"$18.20"},
-  {id:"#OR-10431", service:"Instagram Comments", link:"instagram.com/p/Cm...", qty:"100", progress:100, status:"completed", amount:"$6.50"}
-];
 
 const statusLabel = {processing:"Processing", completed:"Completed", pending:"Pending"};
 const row = (order, full = false) => {
@@ -34,12 +29,40 @@ function renderOrders(items) {
   document.querySelector("#all-orders").innerHTML = items.map(order => row(order, true)).join("");
 }
 
+function renderServices(items) {
+  services = items;
+  const catalog = document.querySelector("#service-catalog");
+  if (catalog) {
+    catalog.innerHTML = items.map(service => `<article class="service-card"><div class="service-logo instagram">✦</div><h2>${escapeHTML(service.name)}</h2><p>${escapeHTML(service.type || "Social growth service")} · ${Number(service.rate || 0).toFixed(2)} per 1k</p><button data-go="new-order" data-service-id="${service.service}">Order this service →</button></article>`).join("") || '<p class="muted">No live services available.</p>';
+  }
+  const options = items.map(service => `<option value="${service.rate}" data-service-id="${service.service}" data-service-name="${service.name}" data-min="${service.min}" data-max="${service.max}">${service.name} · ${service.rate}/1k</option>`).join("");
+  document.querySelector("#service").innerHTML = options;
+  document.querySelector("#quick-service").innerHTML = items.slice(0, 20).map(service => `<option value="${service.service}">${service.name}</option>`).join("");
+  updatePrice("#order-quantity", "#form-price", "#service");
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[character]));
+}
+
+async function loadServices() {
+  try {
+    const result = await api("/services");
+    renderServices(result.services || []);
+  } catch (error) {
+    toast("Service catalog unavailable: " + error.message);
+  }
+}
+
 async function loadAccount() {
   if (!token) return;
   try {
     const [account, orderData] = await Promise.all([api("/me"), api("/orders")]);
     document.querySelector("#auth-screen").classList.add("hidden");
-    renderOrders(orderData.orders);
+    orders = orderData.orders || [];
+    renderOrders(orders);
     document.querySelector(".balance strong").textContent = `$${account.user.balance.toFixed(2)}`;
   } catch {
     localStorage.removeItem("orbit_token");
@@ -106,14 +129,14 @@ document.querySelector("#quick-submit").addEventListener("click", () => {
   if (!document.querySelector("#quick-link").value.trim()) return toast("Please add a profile or post link first.");
   const selected = document.querySelector("#quick-service").selectedOptions[0];
   api("/orders", {method:"POST", body:JSON.stringify({serviceId:Number(selected.value), service:selected.textContent, link:document.querySelector("#quick-link").value, quantity:Number(document.querySelector("#quick-quantity").value)})})
-    .then(result => { toast("Order created successfully — opening order tracker."); renderOrders([result.order, ...orders]); showView("orders"); })
+    .then(result => { toast("Order created successfully — opening order tracker."); orders = [result.order, ...orders]; renderOrders(orders); showView("orders"); })
     .catch(error => toast(error.message));
 });
 document.querySelector("#place-order").addEventListener("click", () => {
   if (!document.querySelector("#order-link").value.trim()) return toast("Please add a profile or post link first.");
   const selected = document.querySelector("#service").selectedOptions[0];
   api("/orders", {method:"POST", body:JSON.stringify({serviceId:Number(selected.value), service:selected.textContent, link:document.querySelector("#order-link").value, quantity:Number(document.querySelector("#order-quantity").value)})})
-    .then(result => { toast("Your order has been placed successfully."); renderOrders([result.order, ...orders]); setTimeout(() => showView("orders"), 700); })
+    .then(result => { toast("Your order has been placed successfully."); orders = [result.order, ...orders]; renderOrders(orders); setTimeout(() => showView("orders"), 700); })
     .catch(error => toast(error.message));
 });
 document.querySelector("#fund-button").addEventListener("click", () => {
@@ -141,5 +164,6 @@ document.querySelector("#login-form").addEventListener("submit", async event => 
   }
 });
 
+loadServices();
 loadAccount();
 loadCatalog();
