@@ -33,12 +33,26 @@ function renderServices(items) {
   services = items;
   const catalog = document.querySelector("#service-catalog");
   if (catalog) {
-    catalog.innerHTML = items.map(service => `<article class="service-card"><div class="service-logo instagram">✦</div><h2>${escapeHTML(service.name)}</h2><p>${escapeHTML(service.type || "Social growth service")} · ${Number(service.rate || 0).toFixed(2)} per 1k</p><button data-go="new-order" data-service-id="${service.service}">Order this service →</button></article>`).join("") || '<p class="muted">No live services available.</p>';
+    const groups = groupServices(items);
+    catalog.className = "service-directory";
+    catalog.innerHTML = groups.map(group => `<section class="service-group"><h2>${escapeHTML(group.title)}</h2><div class="service-list">${group.services.map(service => `<button class="service-link" data-go="new-order" data-service-id="${service.service}"><span class="platform-icon">${platformIcon(group.title)}</span><span>${escapeHTML(service.name)}</span><b>→</b></button>`).join("")}</div></section>`).join("") || '<p class="muted">No live services available.</p>';
   }
-  const options = items.map(service => `<option value="${service.rate}" data-service-id="${service.service}" data-service-name="${service.name}" data-min="${service.min}" data-max="${service.max}">${service.name} · ${service.rate}/1k</option>`).join("");
-  document.querySelector("#service").innerHTML = options;
-  document.querySelector("#quick-service").innerHTML = items.slice(0, 20).map(service => `<option value="${service.service}">${service.name}</option>`).join("");
-  updatePrice("#order-quantity", "#form-price", "#service");
+}
+
+const popularPlatforms = ["Instagram", "YouTube", "TikTok", "Facebook", "Telegram", "Twitter", "LinkedIn", "Spotify"];
+const platformIcon = title => ({Instagram:"◎", YouTube:"▶", TikTok:"♪", Facebook:"f", Telegram:"✈", Twitter:"♥", LinkedIn:"in", Spotify:"♫"}[title] || "✦");
+const platformName = category => popularPlatforms.find(platform => category.toLowerCase().includes(platform.toLowerCase())) || "Other platforms";
+function groupServices(items) {
+  const grouped = new Map();
+  items.forEach(service => {
+    const title = platformName(service.category || service.name);
+    if (!grouped.has(title)) grouped.set(title, []);
+    grouped.get(title).push(service);
+  });
+  return [...grouped.entries()].sort((a, b) => {
+    const ai = popularPlatforms.indexOf(a[0]), bi = popularPlatforms.indexOf(b[0]);
+    return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+  }).map(([title, group]) => ({title, services: group}));
 }
 
 function escapeHTML(value) {
@@ -50,7 +64,8 @@ function escapeHTML(value) {
 async function loadServices() {
   try {
     const result = await api("/services");
-    renderServices(result.services || []);
+    services = result.services || [];
+    renderServices(services);
   } catch (error) {
     toast("Service catalog unavailable: " + error.message);
   }
@@ -100,18 +115,25 @@ async function loadCatalog() {
   const quickSelect = document.querySelector("#quick-service");
   try {
     const categoryData = await api("/categories");
-    categorySelect.innerHTML = categoryData.categories.map(category => `<option value="${category}">${category}</option>`).join("");
-    const loadServices = async () => {
+    const categories = categoryData.categories.sort((a, b) => {
+      const ai = popularPlatforms.findIndex(platform => a.toLowerCase().includes(platform.toLowerCase()));
+      const bi = popularPlatforms.findIndex(platform => b.toLowerCase().includes(platform.toLowerCase()));
+      return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+    categorySelect.innerHTML = categories.map(category => `<option value="${category}">${platformName(category)} · ${category}</option>`).join("");
+    const loadCategoryServices = async () => {
       const data = await api("/services?category=" + encodeURIComponent(categorySelect.value));
       catalogServices = data.services;
-      serviceSelect.innerHTML = data.services.map(service => `<option value="${service.service}" data-rate="${service.rate}" data-min="${service.min}" data-max="${service.max}">${service.name} · ${service.rate}/1K</option>`).join("");
+      serviceSelect.innerHTML = data.services.map(service => `<option value="${service.service}" data-rate="${service.rate}" data-min="${service.min}" data-max="${service.max}" data-type="${escapeHTML(service.type || "")}">${service.name} · ${service.rate}/1K</option>`).join("");
       serviceSelect.dispatchEvent(new Event("change"));
     };
-    await loadServices();
     const all = await api("/services");
-    quickSelect.innerHTML = all.services.map(service => `<option value="${service.service}" data-rate="${service.rate}">${service.category} · ${service.name}</option>`).join("");
+    services = all.services || [];
+    renderServices(services);
+    await loadCategoryServices();
+    quickSelect.innerHTML = services.slice(0, 20).map(service => `<option value="${service.service}" data-rate="${service.rate}">${service.category} · ${service.name}</option>`).join("");
     quickSelect.dispatchEvent(new Event("change"));
-    categorySelect.addEventListener("change", loadServices);
+    categorySelect.addEventListener("change", loadCategoryServices);
   } catch (error) {
     toast("Could not load service catalog: " + error.message);
   }
@@ -123,6 +145,8 @@ document.querySelector("#order-quantity").addEventListener("input", () => update
 document.querySelector("#service").addEventListener("change", () => {
   const option = document.querySelector("#service").selectedOptions[0];
   document.querySelector("#order-quantity").min = option?.dataset.min || 1;
+  const type = (option?.dataset.type || "").toLowerCase();
+  document.querySelector("#custom-comments").classList.toggle("visible", type.includes("comment"));
   updatePrice("#order-quantity", "#form-price", "#service");
 });
 document.querySelector("#quick-submit").addEventListener("click", () => {
@@ -135,7 +159,9 @@ document.querySelector("#quick-submit").addEventListener("click", () => {
 document.querySelector("#place-order").addEventListener("click", () => {
   if (!document.querySelector("#order-link").value.trim()) return toast("Please add a profile or post link first.");
   const selected = document.querySelector("#service").selectedOptions[0];
-  api("/orders", {method:"POST", body:JSON.stringify({serviceId:Number(selected.value), service:selected.textContent, link:document.querySelector("#order-link").value, quantity:Number(document.querySelector("#order-quantity").value)})})
+  const comments = document.querySelector("#order-comments").value.trim();
+  if (document.querySelector("#custom-comments").classList.contains("visible") && !comments) return toast("Please add your custom comments.");
+  api("/orders", {method:"POST", body:JSON.stringify({serviceId:Number(selected.value), service:selected.textContent, link:document.querySelector("#order-link").value, quantity:Number(document.querySelector("#order-quantity").value), extra: comments ? {comments} : {}})})
     .then(result => { toast("Your order has been placed successfully."); orders = [result.order, ...orders]; renderOrders(orders); setTimeout(() => showView("orders"), 700); })
     .catch(error => toast(error.message));
 });
