@@ -35,7 +35,7 @@ function renderServices(items) {
   if (catalog) {
     const groups = groupServices(items);
     catalog.className = "service-directory";
-    catalog.innerHTML = groups.map(group => `<section class="service-group"><h2>${escapeHTML(group.title)}</h2><div class="service-list">${group.services.map(service => `<button class="service-link" data-go="new-order" data-service-id="${service.service}"><span class="platform-icon">${platformIcon(group.title)}</span><span>${escapeHTML(service.name)}</span><b>→</b></button>`).join("")}</div></section>`).join("") || '<p class="muted">No live services available.</p>';
+    catalog.innerHTML = groups.map(group => `<section class="service-group"><h2><span class="platform-icon">${platformIcon(group.title)}</span>${escapeHTML(group.title)} services</h2><div class="service-list">${group.services.map(service => `<div class="service-link"><span class="service-name">${escapeHTML(service.name)}</span><small>${Number(service.rate || 0).toFixed(2)} / 1K · ${Number(service.min || 0).toLocaleString()}–${Number(service.max || 0).toLocaleString()}</small><button data-go="new-order" data-service-id="${service.service}">Order <b>→</b></button></div>`).join("")}</div></section>`).join("") || '<p class="muted">No live services available.</p>';
   }
 }
 
